@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+          http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="appSettings" class="com.tenchael.toauth2.provider.commons.Settings">
+		<property name="configProperties">
+			<bean
+				class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+				<property name="propertiesArray">
+					<list>
+						<bean
+							class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+							<property name="location" value="classpath:/props/application.properties" />
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<import resource="classpath:conf/dao-context.xml" />
+	<import resource="classpath:conf/entity-context.xml" />
+	<import resource="classpath:conf/service-context.xml" />
+	<import resource="classpath:conf/spring-config-cache.xml" />
+	<import resource="classpath:conf/spring-config-shiro.xml" />
+</beans>
