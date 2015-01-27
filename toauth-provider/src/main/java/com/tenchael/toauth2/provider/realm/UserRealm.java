@@ -32,7 +32,7 @@ public class UserRealm extends AuthorizingRealm {
 
 		String username = (String) token.getPrincipal();
 
-		User user = userService.getByUsername(username);
+		User user = userService.findByUsername(username);
 
 		if (user == null) {
 			throw new UnknownAccountException();// 没找到帐号

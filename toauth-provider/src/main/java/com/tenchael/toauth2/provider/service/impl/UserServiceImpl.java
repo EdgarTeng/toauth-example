@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
 		return userDao.findAll(pageable);
 	}
 
-	public User getByUsername(String username) {
+	public User findByUsername(String username) {
 		return userDao.findByUsername(username);
 	}
 
