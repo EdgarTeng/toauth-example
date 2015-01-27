@@ -2,22 +2,16 @@ package com.tenchael.toauth2.client;
 
 import org.apache.shiro.authc.AuthenticationToken;
 
-/**
- * <p>
- * User: Zhang Kaitao
- * <p>
- * Date: 14-2-18
- * <p>
- * Version: 1.0
- */
 public class OAuth2Token implements AuthenticationToken {
+
+	private static final long serialVersionUID = 1L;
+
+	private String authCode;
+	private String principal;
 
 	public OAuth2Token(String authCode) {
 		this.authCode = authCode;
 	}
-
-	private String authCode;
-	private String principal;
 
 	public String getAuthCode() {
 		return authCode;

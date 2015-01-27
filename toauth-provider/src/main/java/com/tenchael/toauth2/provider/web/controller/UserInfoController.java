@@ -14,6 +14,8 @@ import org.apache.oltu.oauth2.common.message.types.ParameterStyle;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 import org.apache.oltu.oauth2.rs.request.OAuthAccessResourceRequest;
 import org.apache.oltu.oauth2.rs.response.OAuthRSResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,13 +24,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tenchael.toauth2.provider.domian.User;
 import com.tenchael.toauth2.provider.service.OAuthService;
+import com.tenchael.toauth2.provider.service.UserService;
 
 @RestController
 public class UserInfoController {
 
 	@Autowired
 	private OAuthService oAuthService;
+
+	@Autowired
+	private UserService userService;
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(UserInfoController.class);
 
 	@RequestMapping("/userInfo")
 	public HttpEntity userInfo(HttpServletRequest request)
@@ -53,12 +65,24 @@ public class UserInfoController {
 				HttpHeaders headers = new HttpHeaders();
 				headers.add(OAuth.HeaderType.WWW_AUTHENTICATE, oauthResponse
 						.getHeader(OAuth.HeaderType.WWW_AUTHENTICATE));
-				return new ResponseEntity(headers, HttpStatus.UNAUTHORIZED);
+				return new ResponseEntity<HttpHeaders>(headers,
+						HttpStatus.UNAUTHORIZED);
 			}
 			// 返回用户名
 			String username = oAuthService
 					.getUsernameByAccessToken(accessToken);
-			return new ResponseEntity(username, HttpStatus.OK);
+			User user = userService.findByUsername(username);
+
+			ObjectMapper mapper = new ObjectMapper(); // create once, reuse
+			String userJosn = null;
+			try {
+				userJosn = mapper.writeValueAsString(user);
+				logger.info(userJosn);
+			} catch (JsonProcessingException e) {
+				logger.error("object to json error:{}", e.getMessage());
+			}
+
+			return new ResponseEntity<String>(userJosn, HttpStatus.OK);
 		} catch (OAuthProblemException e) {
 			// 检查是否设置了错误码
 			String errorCode = e.getError();
@@ -70,7 +94,8 @@ public class UserInfoController {
 				HttpHeaders headers = new HttpHeaders();
 				headers.add(OAuth.HeaderType.WWW_AUTHENTICATE, oauthResponse
 						.getHeader(OAuth.HeaderType.WWW_AUTHENTICATE));
-				return new ResponseEntity(headers, HttpStatus.UNAUTHORIZED);
+				return new ResponseEntity<HttpHeaders>(headers,
+						HttpStatus.UNAUTHORIZED);
 			}
 
 			OAuthResponse oauthResponse = OAuthRSResponse

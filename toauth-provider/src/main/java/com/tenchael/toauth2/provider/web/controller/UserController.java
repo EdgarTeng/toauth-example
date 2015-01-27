@@ -57,6 +57,7 @@ public class UserController {
 	@RequestMapping(value = "/{id}/update", method = RequestMethod.POST)
 	public String update(User user, RedirectAttributes redirectAttributes) {
 		userService.update(user);
+		logger.info("update user info as {}", user);
 		redirectAttributes.addFlashAttribute(MESSAGE, "修改成功");
 		return "redirect:/user";
 	}

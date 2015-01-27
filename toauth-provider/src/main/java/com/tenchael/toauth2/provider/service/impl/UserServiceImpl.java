@@ -44,6 +44,8 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional(readOnly = false)
 	public User update(User entity) {
+		entity.getUserDetails().setUser(entity);
+		entity.getUserDetails().setLastUpdate(new java.util.Date());
 		User queryUser = get(entity.getId());
 		entity.setCreateTime(queryUser.getCreateTime());
 		// 加密密码

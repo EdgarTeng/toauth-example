@@ -117,14 +117,14 @@
 	<bean id="oAuth2AuthenticationFilter"
 		class="com.tenchael.toauth2.client.filter.OAuth2AuthenticationFilter">
 		<property name="authcCodeParam" value="code" />
-		<property name="failureUrl" value="/oauth2Failure.jsp" />
+		<property name="failureUrl" value="${oauth2.failure.url}" />
 	</bean>
 
 	<!-- Shiro的Web过滤器 -->
 	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
 		<property name="securityManager" ref="securityManager" />
 		<property name="loginUrl" value="#{appSettings.providerAuthorizeUrl}" />
-		<property name="successUrl" value="/" />
+		<property name="successUrl" value="${oauth2.success.url}" />
 		<property name="filters">
 			<util:map>
 				<entry key="oauth2Authc" value-ref="oAuth2AuthenticationFilter" />
