@@ -38,7 +38,7 @@ public class AccessTokenController {
 	private UserService userService;
 
 	@RequestMapping("/accessToken")
-	public HttpEntity token(HttpServletRequest request)
+	public HttpEntity<String> token(HttpServletRequest request)
 			throws URISyntaxException, OAuthSystemException {
 
 		try {
@@ -52,7 +52,7 @@ public class AccessTokenController {
 						.setError(OAuthError.TokenResponse.INVALID_CLIENT)
 						.setErrorDescription(INVALID_CLIENT_DESCRIPTION)
 						.buildJSONMessage();
-				return new ResponseEntity(response.getBody(),
+				return new ResponseEntity<String>(response.getBody(),
 						HttpStatus.valueOf(response.getResponseStatus()));
 			}
 
@@ -63,7 +63,7 @@ public class AccessTokenController {
 						.setError(OAuthError.TokenResponse.UNAUTHORIZED_CLIENT)
 						.setErrorDescription(INVALID_CLIENT_DESCRIPTION)
 						.buildJSONMessage();
-				return new ResponseEntity(response.getBody(),
+				return new ResponseEntity<String>(response.getBody(),
 						HttpStatus.valueOf(response.getResponseStatus()));
 			}
 
@@ -76,7 +76,7 @@ public class AccessTokenController {
 							.errorResponse(HttpServletResponse.SC_BAD_REQUEST)
 							.setError(OAuthError.TokenResponse.INVALID_GRANT)
 							.setErrorDescription("错误的授权码").buildJSONMessage();
-					return new ResponseEntity(response.getBody(),
+					return new ResponseEntity<String>(response.getBody(),
 							HttpStatus.valueOf(response.getResponseStatus()));
 				}
 			}
@@ -96,7 +96,7 @@ public class AccessTokenController {
 					.buildJSONMessage();
 
 			// 根据OAuthResponse生成ResponseEntity
-			return new ResponseEntity(response.getBody(),
+			return new ResponseEntity<String>(response.getBody(),
 					HttpStatus.valueOf(response.getResponseStatus()));
 
 		} catch (OAuthProblemException e) {
@@ -104,8 +104,8 @@ public class AccessTokenController {
 			OAuthResponse res = OAuthASResponse
 					.errorResponse(HttpServletResponse.SC_BAD_REQUEST).error(e)
 					.buildJSONMessage();
-			return new ResponseEntity(res.getBody(), HttpStatus.valueOf(res
-					.getResponseStatus()));
+			return new ResponseEntity<String>(res.getBody(),
+					HttpStatus.valueOf(res.getResponseStatus()));
 		}
 	}
 

@@ -2,9 +2,17 @@ package com.tenchael.toauth2.provider.service.impl;
 
 import java.util.List;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +35,7 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
-	public User get(Long id) {
+	public User findOne(Long id) {
 		return userDao.findOne(id);
 	}
 
@@ -46,7 +54,7 @@ public class UserServiceImpl implements UserService {
 	public User update(User entity) {
 		entity.getUserDetails().setUser(entity);
 		entity.getUserDetails().setLastUpdate(new java.util.Date());
-		User queryUser = get(entity.getId());
+		User queryUser = findOne(entity.getId());
 		entity.setCreateTime(queryUser.getCreateTime());
 		// 加密密码
 		passwordHelper.encryptPassword(entity);
@@ -55,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional(readOnly = false)
 	public User delete(Long id) {
-		User user = get(id);
+		User user = findOne(id);
 		userDetailsService.delete(user.getUserDetails().getId());
 		userDao.delete(id);
 		return user;
@@ -69,8 +77,19 @@ public class UserServiceImpl implements UserService {
 		return userDao.findAll(pageable);
 	}
 
-	public User findByUsername(String username) {
-		return userDao.findByUsername(username);
+	public User findByUsername(final String username) {
+		Specification<User> spec = new Specification<User>() {
+			public Predicate toPredicate(Root<User> root,
+					CriteriaQuery<?> query, CriteriaBuilder cb) {
+				return cb.equal(root.<String> get("username"), username);
+			}
+		};
+		List<User> list = userDao.findAll(spec);
+		if (list != null && !list.isEmpty()) {
+			return list.get(0);
+		} else {
+			return null;
+		}
 	}
 
 	@Transactional(readOnly = false)
@@ -81,6 +100,16 @@ public class UserServiceImpl implements UserService {
 		userDao.save(user);
 		return user;
 
+	}
+
+	public User getCurrentUser() {
+		Subject subject = SecurityUtils.getSubject();
+		if (subject == null || !subject.isAuthenticated()) {
+			return null;
+		}
+
+		String username = (String) subject.getPrincipal();
+		return findByUsername(username);
 	}
 
 }

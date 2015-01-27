@@ -3,6 +3,8 @@ package com.tenchael.toauth2.provider.web.controller;
 import static com.tenchael.toauth2.provider.commons.Constants.MESSAGE;
 import static com.tenchael.toauth2.provider.commons.Constants.OPERATION;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,69 +15,68 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.tenchael.toauth2.provider.domian.Client;
-import com.tenchael.toauth2.provider.service.ClientService;
+import com.tenchael.toauth2.provider.domian.StatusMsg;
+import com.tenchael.toauth2.provider.domian.User;
+import com.tenchael.toauth2.provider.service.StatusMsgService;
+import com.tenchael.toauth2.provider.service.UserService;
 
 @Controller
-@RequestMapping("/client")
-public class ClientController {
+@RequestMapping("/statusMsg")
+public class StatusMsgController {
 
 	@Autowired
-	private ClientService clientService;
+	private StatusMsgService statusMsgService;
+
+	@Autowired
+	private UserService userService;
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(ClientController.class);
+			.getLogger(StatusMsgController.class);
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String list(Model model) {
-		model.addAttribute("clientList", clientService.findAll());
-		return "client/list";
+		model.addAttribute("statusMsgList", statusMsgService.findAllVisible());
+		return "statusMsg/list";
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
 	public String showCreateForm(Model model) {
-		model.addAttribute("client", new Client());
+		model.addAttribute("statusMsg", new StatusMsg());
 		model.addAttribute(OPERATION, "新增");
-		return "client/edit";
+		return "statusMsg/edit";
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String create(Client client, RedirectAttributes redirectAttributes) {
-		clientService.save(client);
-		logger.info("save a client, client information is {}", client);
-		redirectAttributes.addFlashAttribute(MESSAGE, "新增成功");
-		return "redirect:/client";
-	}
-
-	@RequestMapping(value = "/{id}/update", method = RequestMethod.GET)
-	public String showUpdateForm(@PathVariable("id") Long id, Model model) {
-		model.addAttribute("client", clientService.findOne(id));
-		model.addAttribute(OPERATION, "修改");
-		return "client/edit";
-	}
-
-	@RequestMapping(value = "/{id}/update", method = RequestMethod.POST)
-	public String update(@PathVariable("id") Long id, Client client,
+	public String create(StatusMsg statusMsg,
 			RedirectAttributes redirectAttributes) {
-		clientService.update(client);
-		redirectAttributes.addFlashAttribute(MESSAGE, "修改成功");
-		return "redirect:/client";
+		User user = userService.getCurrentUser();
+		// 如果用户没有登录，跳转到登陆页面
+		if (user == null) {
+			return "oauth2login";
+		}
+		statusMsg.setUser(user);
+		statusMsgService.save(statusMsg);
+		logger.info("publish a statusMsg, statusMsg content is {}",
+				statusMsg.getContent());
+		redirectAttributes.addFlashAttribute(MESSAGE, "新增成功");
+		return "redirect:/statusMsg";
 	}
 
 	@RequestMapping(value = "/{id}/delete", method = RequestMethod.GET)
 	public String showDeleteForm(@PathVariable("id") Long id, Model model) {
-		model.addAttribute("client", clientService.findOne(id));
+		model.addAttribute("statusMsg", statusMsgService.findOne(id));
 		model.addAttribute(OPERATION, "删除");
-		return "client/edit";
+		return "statusMsg/edit";
 	}
 
 	@RequestMapping(value = "/{id}/delete", method = RequestMethod.POST)
 	public String delete(@PathVariable("id") Long id,
 			RedirectAttributes redirectAttributes) {
-		Client deleteClient = clientService.delete(id);
-		logger.info("delete client, client info is:{}", deleteClient);
+		StatusMsg statusMsg = statusMsgService.delete(id);
+		logger.info("delete a statusMsg, statusMsg content is: {}",
+				statusMsg.getContent());
 		redirectAttributes.addFlashAttribute(MESSAGE, "删除成功");
-		return "redirect:/client";
+		return "redirect:/statusMsg";
 	}
 
 }

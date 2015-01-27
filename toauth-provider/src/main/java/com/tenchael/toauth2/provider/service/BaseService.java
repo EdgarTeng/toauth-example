@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface BaseService<T, ID> {
 
-	T get(ID id);
+	T findOne(ID id);
 
 	T save(T entity);
 

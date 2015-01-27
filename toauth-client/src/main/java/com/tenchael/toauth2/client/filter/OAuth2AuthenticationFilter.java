@@ -11,6 +11,8 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 import org.apache.shiro.web.util.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.tenchael.toauth2.client.OAuth2Token;
@@ -27,6 +29,9 @@ public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
 	private String responseType = "code";
 
 	private String failureUrl;
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(OAuth2AuthenticationFilter.class);
 
 	public void setAuthcCodeParam(String authcCodeParam) {
 		this.authcCodeParam = authcCodeParam;
@@ -51,6 +56,7 @@ public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
 	@Override
 	protected AuthenticationToken createToken(ServletRequest request,
 			ServletResponse response) throws Exception {
+		//extract authorization code
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		String code = httpRequest.getParameter(authcCodeParam);
 		return new OAuth2Token(code);
@@ -69,6 +75,8 @@ public class OAuth2AuthenticationFilter extends AuthenticatingFilter {
 		String error = request.getParameter("error");
 		String errorDescription = request.getParameter("error_description");
 		if (!StringUtils.isEmpty(error)) {// 如果服务端返回了错误
+			logger.error("error is: {},\nthe error description is: {}", error,
+					errorDescription);
 			WebUtils.issueRedirect(request, response, failureUrl + "?error="
 					+ error + "error_description=" + errorDescription);
 			return false;

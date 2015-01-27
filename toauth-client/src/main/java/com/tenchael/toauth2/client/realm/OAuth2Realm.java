@@ -16,6 +16,8 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tenchael.toauth2.client.OAuth2Token;
 import com.tenchael.toauth2.client.filter.OAuth2AuthenticationException;
@@ -27,6 +29,9 @@ public class OAuth2Realm extends AuthorizingRealm {
 	private String accessTokenUrl;
 	private String userInfoUrl;
 	private String redirectUrl;
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(OAuth2Realm.class);
 
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
@@ -76,7 +81,10 @@ public class OAuth2Realm extends AuthorizingRealm {
 
 		try {
 			OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
+			
+			//oAuthClient.
 
+			//request access token
 			OAuthClientRequest accessTokenRequest = OAuthClientRequest
 					.tokenLocation(accessTokenUrl)
 					.setGrantType(GrantType.AUTHORIZATION_CODE)
@@ -90,6 +98,7 @@ public class OAuth2Realm extends AuthorizingRealm {
 			String accessToken = oAuthResponse.getAccessToken();
 			Long expiresIn = oAuthResponse.getExpiresIn();
 
+			//request user info
 			OAuthClientRequest userInfoRequest = new OAuthBearerClientRequest(
 					userInfoUrl).setAccessToken(accessToken)
 					.buildQueryMessage();
@@ -98,7 +107,7 @@ public class OAuth2Realm extends AuthorizingRealm {
 					userInfoRequest, OAuth.HttpMethod.GET,
 					OAuthResourceResponse.class);
 			String username = resourceResponse.getBody();
-			System.out.println("------------" + username);
+			logger.info("the username is: {}", username);
 			return username;
 		} catch (Exception e) {
 			e.printStackTrace();

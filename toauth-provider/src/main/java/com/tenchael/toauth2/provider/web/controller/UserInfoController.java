@@ -24,9 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tenchael.toauth2.provider.domian.User;
 import com.tenchael.toauth2.provider.service.OAuthService;
 import com.tenchael.toauth2.provider.service.UserService;
 
@@ -71,18 +68,8 @@ public class UserInfoController {
 			// 返回用户名
 			String username = oAuthService
 					.getUsernameByAccessToken(accessToken);
-			User user = userService.findByUsername(username);
 
-			ObjectMapper mapper = new ObjectMapper(); // create once, reuse
-			String userJosn = null;
-			try {
-				userJosn = mapper.writeValueAsString(user);
-				logger.info(userJosn);
-			} catch (JsonProcessingException e) {
-				logger.error("object to json error:{}", e.getMessage());
-			}
-
-			return new ResponseEntity<String>(userJosn, HttpStatus.OK);
+			return new ResponseEntity<String>(username, HttpStatus.OK);
 		} catch (OAuthProblemException e) {
 			// 检查是否设置了错误码
 			String errorCode = e.getError();

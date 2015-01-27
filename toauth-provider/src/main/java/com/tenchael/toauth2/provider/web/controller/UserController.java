@@ -49,7 +49,7 @@ public class UserController {
 
 	@RequestMapping(value = "/{id}/update", method = RequestMethod.GET)
 	public String showUpdateForm(@PathVariable("id") Long id, Model model) {
-		model.addAttribute("user", userService.get(id));
+		model.addAttribute("user", userService.findOne(id));
 		model.addAttribute(OPERATION, "修改");
 		return "user/edit";
 	}
@@ -64,7 +64,7 @@ public class UserController {
 
 	@RequestMapping(value = "/{id}/delete", method = RequestMethod.GET)
 	public String showDeleteForm(@PathVariable("id") Long id, Model model) {
-		model.addAttribute("user", userService.get(id));
+		model.addAttribute("user", userService.findOne(id));
 		model.addAttribute(OPERATION, "删除");
 		return "user/edit";
 	}
@@ -81,7 +81,7 @@ public class UserController {
 	@RequestMapping(value = "/{id}/changePassword", method = RequestMethod.GET)
 	public String showChangePasswordForm(@PathVariable("id") Long id,
 			Model model) {
-		model.addAttribute("user", userService.get(id));
+		model.addAttribute("user", userService.findOne(id));
 		model.addAttribute(OPERATION, "修改密码");
 		return "user/changePassword";
 	}

@@ -7,5 +7,7 @@ public interface UserService extends BaseService<User, Long> {
 	User findByUsername(String username);
 
 	User modifyPassword(Long userId, String newPassword);
+	
+	User getCurrentUser();
 
 }

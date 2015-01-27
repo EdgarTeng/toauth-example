@@ -26,7 +26,7 @@ public class ClientServiceImpl implements ClientService {
 	@Autowired
 	private ClientDao clientDao;
 
-	public Client get(Long id) {
+	public Client findOne(Long id) {
 		return clientDao.findOne(id);
 	}
 
@@ -40,14 +40,14 @@ public class ClientServiceImpl implements ClientService {
 
 	@Transactional(readOnly = false)
 	public Client update(Client entity) {
-		Client queryClient = get(entity.getId());
+		Client queryClient = findOne(entity.getId());
 		entity.setCreateTime(queryClient.getCreateTime());
 		return clientDao.save(entity);
 	}
 
 	@Transactional(readOnly = false)
 	public Client delete(Long id) {
-		Client client = get(id);
+		Client client = findOne(id);
 		clientDao.delete(id);
 		return client;
 	}

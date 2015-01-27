@@ -30,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Autowired
 	private UserDetailsDao userDetailsDao;
 
-	public UserDetails get(Long id) {
+	public UserDetails findOne(Long id) {
 		return userDetailsDao.findOne(id);
 	}
 
@@ -47,7 +47,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Transactional(readOnly = false)
 	public UserDetails delete(Long id) {
 		logger.info("delete UserDetails id={}", id);
-		UserDetails userDetails = get(id);
+		UserDetails userDetails = findOne(id);
 		userDetailsDao.delete(id);
 		return userDetails;
 	}

@@ -58,7 +58,7 @@ public class AuthorizeController {
 						.setError(OAuthError.TokenResponse.INVALID_CLIENT)
 						.setErrorDescription(INVALID_CLIENT_DESCRIPTION)
 						.buildJSONMessage();
-				return new ResponseEntity(response.getBody(),
+				return new ResponseEntity<String>(response.getBody(),
 						HttpStatus.valueOf(response.getResponseStatus()));
 			}
 
@@ -102,15 +102,15 @@ public class AuthorizeController {
 			// 根据OAuthResponse返回ResponseEntity响应
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(new URI(response.getLocationUri()));
-			return new ResponseEntity(headers, HttpStatus.valueOf(response
-					.getResponseStatus()));
+			return new ResponseEntity<HttpHeaders>(headers,
+					HttpStatus.valueOf(response.getResponseStatus()));
 		} catch (OAuthProblemException e) {
 
 			// 出错处理
 			String redirectUri = e.getRedirectUri();
 			if (OAuthUtils.isEmpty(redirectUri)) {
 				// 告诉客户端没有传入redirectUri直接报错
-				return new ResponseEntity(
+				return new ResponseEntity<String>(
 						"OAuth callback url needs to be provided by client!!!",
 						HttpStatus.NOT_FOUND);
 			}
@@ -121,8 +121,8 @@ public class AuthorizeController {
 					.location(redirectUri).buildQueryMessage();
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(new URI(response.getLocationUri()));
-			return new ResponseEntity(headers, HttpStatus.valueOf(response
-					.getResponseStatus()));
+			return new ResponseEntity<HttpHeaders>(headers,
+					HttpStatus.valueOf(response.getResponseStatus()));
 		}
 	}
 
