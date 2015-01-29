@@ -11,6 +11,7 @@ import javax.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,12 +63,9 @@ public class StatusMsgServiceImpl implements StatusMsgService {
 
 			public Predicate toPredicate(Root<StatusMsg> root,
 					CriteriaQuery<?> query, CriteriaBuilder cb) {
-				List<Predicate> predicates = new ArrayList<Predicate>();
-				predicates.add(cb.equal(root.<User> get("user")
-						.<Long> get("id"), userId));
-				predicates.add(cb.equal(root.<Boolean> get("visible"), true));
-				cb.and(predicates.toArray(new Predicate[predicates.size()]));
-				return cb.conjunction();
+				return cb.and(cb.equal(
+						root.<User> get("user").<Long> get("id"), userId), cb
+						.equal(root.<Boolean> get("visible"), Boolean.TRUE));
 			}
 		};
 		return statusMsgDao.findAll(spec);
@@ -78,12 +76,9 @@ public class StatusMsgServiceImpl implements StatusMsgService {
 
 			public Predicate toPredicate(Root<StatusMsg> root,
 					CriteriaQuery<?> query, CriteriaBuilder cb) {
-				List<Predicate> predicates = new ArrayList<Predicate>();
-				predicates.add(cb.equal(root.<User> get("user")
-						.<Long> get("id"), userId));
-				predicates.add(cb.equal(root.<Boolean> get("visible"), true));
-				cb.and(predicates.toArray(new Predicate[predicates.size()]));
-				return cb.conjunction();
+				return cb.and(cb.equal(
+						root.<User> get("user").<Long> get("id"), userId), cb
+						.equal(root.<Boolean> get("visible"), Boolean.TRUE));
 			}
 		};
 		return statusMsgDao.findAll(spec, pageable);
@@ -109,6 +104,30 @@ public class StatusMsgServiceImpl implements StatusMsgService {
 			}
 		};
 		return statusMsgDao.findAll(spec, pageable);
+	}
+
+	public List<StatusMsg> findAllVisible(Sort sort) {
+		Specification<StatusMsg> spec = new Specification<StatusMsg>() {
+
+			public Predicate toPredicate(Root<StatusMsg> root,
+					CriteriaQuery<?> query, CriteriaBuilder cb) {
+				return cb.equal(root.<Boolean> get("visible"), true);
+			}
+		};
+		return statusMsgDao.findAll(spec, sort);
+	}
+
+	public List<StatusMsg> findAllVisible(final Long userId, Sort sort) {
+		Specification<StatusMsg> spec = new Specification<StatusMsg>() {
+
+			public Predicate toPredicate(Root<StatusMsg> root,
+					CriteriaQuery<?> query, CriteriaBuilder cb) {
+				return cb.and(cb.equal(
+						root.<User> get("user").<Long> get("id"), userId), cb
+						.equal(root.<Boolean> get("visible"), Boolean.TRUE));
+			}
+		};
+		return statusMsgDao.findAll(spec, sort);
 	}
 
 }

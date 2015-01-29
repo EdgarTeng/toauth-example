@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tenchael.toauth2.provider.domian.User;
 import com.tenchael.toauth2.provider.service.OAuthService;
 import com.tenchael.toauth2.provider.service.UserService;
 
@@ -69,7 +70,11 @@ public class UserInfoController {
 			String username = oAuthService
 					.getUsernameByAccessToken(accessToken);
 
-			return new ResponseEntity<String>(username, HttpStatus.OK);
+			User user = userService.findByUsername(username);
+			String userInfoJson = user.toSimpleJson().toString();
+			logger.info("user info json", userInfoJson);
+
+			return new ResponseEntity<String>(userInfoJson, HttpStatus.OK);
 		} catch (OAuthProblemException e) {
 			// 检查是否设置了错误码
 			String errorCode = e.getError();

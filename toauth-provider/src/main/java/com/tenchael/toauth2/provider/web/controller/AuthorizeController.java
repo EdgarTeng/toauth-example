@@ -5,6 +5,8 @@ import static com.tenchael.toauth2.provider.commons.Constants.INVALID_CLIENT_DES
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +34,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.tenchael.toauth2.provider.commons.HttpUtils;
 import com.tenchael.toauth2.provider.service.ClientService;
 import com.tenchael.toauth2.provider.service.OAuthService;
 
@@ -85,25 +88,21 @@ public class AuthorizeController {
 				oAuthService.addAuthCode(authorizationCode, username);
 			}
 
-			// 进行OAuth响应构建
-			OAuthASResponse.OAuthAuthorizationResponseBuilder builder = OAuthASResponse
-					.authorizationResponse(request,
-							HttpServletResponse.SC_FOUND);
-			// 设置授权码
-			builder.setCode(authorizationCode);
+			/*
+			 * // 进行OAuth响应构建 OAuthASResponse.OAuthAuthorizationResponseBuilder
+			 * builder = OAuthASResponse .authorizationResponse(request,
+			 * HttpServletResponse.SC_FOUND); // 设置授权码
+			 * builder.setCode(authorizationCode);
+			 */
 			// 得到到客户端重定向地址
 			String redirectURI = oauthRequest
 					.getParam(OAuth.OAUTH_REDIRECT_URI);
 
-			// 构建响应
-			final OAuthResponse response = builder.location(redirectURI)
-					.buildQueryMessage();
+			Map<String, String> params = new HashMap<String, String>();
+			params.put("code", authorizationCode);
+			String responseUrl = HttpUtils.jointParams(redirectURI, params);
 
-			// 根据OAuthResponse返回ResponseEntity响应
-			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(new URI(response.getLocationUri()));
-			return new ResponseEntity<HttpHeaders>(headers,
-					HttpStatus.valueOf(response.getResponseStatus()));
+			return "redirect:" + responseUrl;
 		} catch (OAuthProblemException e) {
 
 			// 出错处理

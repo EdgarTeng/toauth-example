@@ -1,7 +1,13 @@
 package com.tenchael.toauth2.client.commons;
 
+import static com.tenchael.toauth2.client.commons.Constants.SESSION_KEY;
+
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 public class HttpUtils {
 
@@ -20,5 +26,21 @@ public class HttpUtils {
 		return buf.toString();
 	}
 
+	// 检查sessionKey是否有效
+	public static boolean checkSessionKey(HttpServletRequest request) {
+		return request.getSession().getAttribute(SESSION_KEY) != null;
+	}
+
+	public static String getSessionKey(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		Object obj = session.getAttribute(SESSION_KEY);
+		if (obj == null) {
+			String sessionKey = UUID.randomUUID().toString();
+			session.setAttribute(SESSION_KEY, sessionKey);
+			return sessionKey;
+		} else {
+			return obj.toString();
+		}
+	}
 
 }

@@ -1,7 +1,5 @@
 package com.tenchael.toauth2.client.commons;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 public class Settings {
@@ -18,8 +16,13 @@ public class Settings {
 	// provider obtain user infomation url
 	public static String PROVIDER_USER_INFO_URL;
 
+	public static String PROVIDER_SYNC_MESSAGE;
+
+	public static String PROVIDER_ACCESS_MSGS_URL;
+
 	public static String CLIENT_BASE_URL;
 	public static String CLIENT_REDIRECT_URL;
+	public static String CLIENT_HOME_URL;
 
 	public static String CLIENT_ID;
 	public static String CLIENT_SECRET;
@@ -50,8 +53,8 @@ public class Settings {
 	public static String getProviderUserInfoUrl() {
 		return PROVIDER_USER_INFO_URL;
 	}
-	
-	public static String getClientRedirectUrl(){
+
+	public static String getClientRedirectUrl() {
 		return CLIENT_REDIRECT_URL;
 	}
 
@@ -66,7 +69,9 @@ public class Settings {
 				// setting parameters for client
 				CLIENT_BASE_URL = getProperty("client.base.url");
 				CLIENT_REDIRECT_URL = CLIENT_BASE_URL
-						+ getProperty("client.redirect");
+						+ getProperty("client.redirect.url");
+				CLIENT_HOME_URL = CLIENT_BASE_URL
+						+ getProperty("client.home.url");
 				CLIENT_ID = getProperty("client.clientId");
 				CLIENT_SECRET = getProperty("client.clientSecret");
 			}
@@ -77,16 +82,22 @@ public class Settings {
 						+ getProperty("provider.accessToken");
 				PROVIDER_USER_INFO_URL = PROVIDER_BASE_URL
 						+ getProperty("provider.userInfo");
-				{
-					// joint authorize url
-					String authorizeBaseUrl = PROVIDER_BASE_URL + getProperty("provider.authorize");
-					Map<String, String> params = new HashMap<String, String>();
-					params.put("client_id", CLIENT_ID);
-					params.put("response_type", "code");
-					params.put("redirect_uri", CLIENT_REDIRECT_URL);
-					PROVIDER_AUTHORIZE_URL = HttpUtils.jointParams(
-							authorizeBaseUrl, params);
-				}
+				PROVIDER_AUTHORIZE_URL = PROVIDER_BASE_URL
+						+ getProperty("provider.authorize");
+				PROVIDER_SYNC_MESSAGE = PROVIDER_BASE_URL
+						+ getProperty("provider.syncMessage");
+				PROVIDER_ACCESS_MSGS_URL = PROVIDER_BASE_URL
+						+ getProperty("provider.accessMsgs");
+				/*
+				 * { // joint authorize url String authorizeBaseUrl =
+				 * PROVIDER_BASE_URL + getProperty("provider.authorize");
+				 * Map<String, String> params = new HashMap<String, String>();
+				 * params.put("client_id", CLIENT_ID);
+				 * params.put("response_type", "code");
+				 * params.put("redirect_uri", CLIENT_REDIRECT_URL);
+				 * PROVIDER_AUTHORIZE_URL = HttpUtils.jointParams(
+				 * authorizeBaseUrl, params); }
+				 */
 			}
 
 		} catch (NotFoundException e) {

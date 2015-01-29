@@ -23,6 +23,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tenchael.toauth2.provider.service.OAuthService;
@@ -37,7 +38,7 @@ public class AccessTokenController {
 	@Autowired
 	private UserService userService;
 
-	@RequestMapping("/accessToken")
+	@RequestMapping(value = "/accessToken", method = RequestMethod.POST)
 	public HttpEntity<String> token(HttpServletRequest request)
 			throws URISyntaxException, OAuthSystemException {
 
@@ -87,11 +88,14 @@ public class AccessTokenController {
 			final String accessToken = oauthIssuerImpl.accessToken();
 			oAuthService.addAccessToken(accessToken,
 					oAuthService.getUsernameByAuthCode(authCode));
+			final String refreshToken = oauthIssuerImpl.refreshToken();
+			oAuthService.addRefreshToken(refreshToken,
+					oAuthService.getUsernameByAuthCode(authCode));
 
 			// 生成OAuth响应
 			OAuthResponse response = OAuthASResponse
 					.tokenResponse(HttpServletResponse.SC_OK)
-					.setAccessToken(accessToken)
+					.setAccessToken(accessToken).setRefreshToken(refreshToken)
 					.setExpiresIn(String.valueOf(oAuthService.getExpireIn()))
 					.buildJSONMessage();
 

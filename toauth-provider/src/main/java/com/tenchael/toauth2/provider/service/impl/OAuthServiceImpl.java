@@ -29,6 +29,10 @@ public class OAuthServiceImpl implements OAuthService {
 		cache.put(accessToken, username);
 	}
 
+	public void addRefreshToken(String refreshToken, String username) {
+		cache.put(refreshToken, username);
+	}
+
 	public String getUsernameByAuthCode(String authCode) {
 		return (String) cache.get(authCode).get();
 	}
@@ -37,12 +41,20 @@ public class OAuthServiceImpl implements OAuthService {
 		return (String) cache.get(accessToken).get();
 	}
 
+	public String getUsernameByRefreshToken(String refreshToken) {
+		return (String) cache.get(refreshToken).get();
+	}
+
 	public boolean checkAuthCode(String authCode) {
 		return cache.get(authCode) != null;
 	}
 
 	public boolean checkAccessToken(String accessToken) {
 		return cache.get(accessToken) != null;
+	}
+
+	public boolean checkRefreshToken(String refreshToken) {
+		return cache.get(refreshToken) != null;
 	}
 
 	public boolean checkClientId(String clientId) {
@@ -56,4 +68,5 @@ public class OAuthServiceImpl implements OAuthService {
 	public long getExpireIn() {
 		return 3600L;
 	}
+
 }

@@ -2,6 +2,7 @@ package com.tenchael.toauth2.provider.domian;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,11 +10,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.json.JSONObject;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tenchael.toauth2.provider.commons.EntityUtils;
+import com.tenchael.toauth2.provider.commons.Jsonable;
 
 @Entity(name = "client")
 @Table(name = "t_client")
-public class Client implements Serializable {
+public class Client implements Serializable, Jsonable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
@@ -100,5 +106,11 @@ public class Client implements Serializable {
 	public String toString() {
 		String[] attrs = { "id", "clientName", "clientId", "clientSecret" };
 		return EntityUtils.toString(this, attrs);
+	}
+
+	public JSONObject toSimpleJson() {
+		String[] attrs = { "id", "clientName", "createTime" };
+		JSONObject json = EntityUtils.toJsonObject(this, attrs);
+		return json;
 	}
 }
